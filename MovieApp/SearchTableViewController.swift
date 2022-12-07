@@ -9,8 +9,9 @@ import UIKit
 
 class SearchTableViewController: UITableViewController {
 
-    let searchController = UISearchController(searchResultsController: SearchResultViewController())
+    let searchController = UISearchController()
     let cellId = "SearchTableViewControllerCell"
+    var viewModel = MoviesViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +22,8 @@ class SearchTableViewController: UITableViewController {
     func configure() {
         view.backgroundColor = .systemBackground
         navigationItem.searchController = searchController
-        
         title = "Search"
+        searchController.searchBar.delegate = self
     }
     
     func configureTableView() {
@@ -36,7 +37,7 @@ class SearchTableViewController: UITableViewController {
 extension SearchTableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        10
+        viewModel.getMovieCount()
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -44,10 +45,22 @@ extension SearchTableViewController {
             return UITableViewCell()
         }
         
+        cell.movie = viewModel.getMovie(at: indexPath.row)
         return cell
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         220
+    }
+}
+
+extension SearchTableViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        APICaller.shared.searchMovieRequest(with: searchText) { data in
+            self.viewModel.movies = data
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
 }

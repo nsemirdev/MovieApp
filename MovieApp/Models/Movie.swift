@@ -6,6 +6,9 @@
 //
 
 import Foundation
+struct ResponseModel: Decodable {
+    var results: [Movie]?
+}
 
 struct Movie: Decodable {
     var original_title: String?

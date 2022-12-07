@@ -6,17 +6,28 @@
 //
 
 import UIKit
+import SDWebImage
+
+
+// https://image.tmdb.org/t/p/w500/k12PqAkuXszXYHFVXcQQrvtdsck.jpg
 
 class MovieTableViewCell: UITableViewCell {
     var movie: Movie? {
         didSet {
-            // ui things
+            let url = URL(string: "https://image.tmdb.org/t/p/w500/\(self.movie?.poster_path ?? "")")
+    
+            DispatchQueue.main.async {
+                self.movieNameLabel.text = self.movie?.original_title
+                self.posterImageView.sd_setImage(with: url)
+                self.detailLabel.text = self.movie?.overview
+            }
         }
     }
     
     // MARK: - UI Elements
-    let poster = UIImageView()
-    let movieName = UILabel()
+    let posterImageView = UIImageView()
+    let movieNameLabel = UILabel()
+    let detailLabel = UILabel()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -29,7 +40,7 @@ class MovieTableViewCell: UITableViewCell {
        super.layoutSubviews()
 
        let contentViewFrame = self.contentView.frame
-       let insetContentViewFrame = contentViewFrame.inset(by: UIEdgeInsets(top: 16, left: 24, bottom: 16, right: 24))
+       let insetContentViewFrame = contentViewFrame.inset(by: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
        self.contentView.frame = insetContentViewFrame
        self.selectedBackgroundView?.frame = insetContentViewFrame
     }
@@ -39,39 +50,55 @@ class MovieTableViewCell: UITableViewCell {
         contentView.backgroundColor = .systemTeal
         contentView.layer.cornerRadius = 15
         
-        contentView.addSubview(poster)
+        contentView.addSubview(posterImageView)
         configurePoster()
         
-        contentView.addSubview(movieName)
-        configureLabel()
+        contentView.addSubview(movieNameLabel)
+        contentView.addSubview(detailLabel)
         
+        configureLabels()
+
     }
     
-    func configureLabel() {
-        movieName.font = .systemFont(ofSize: 32, weight: .thin)
-        movieName.text = "Korku"
-        movieName.textColor = .white
-        movieName.translatesAutoresizingMaskIntoConstraints = false
+    func configureLabels() {
+        movieNameLabel.font = .systemFont(ofSize: 25, weight: .thin)
+        movieNameLabel.textColor = .white
+        movieNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        movieNameLabel.textAlignment = .right
         
         NSLayoutConstraint.activate([
-            movieName.topAnchor.constraint(equalTo: poster.topAnchor),
-            contentView.trailingAnchor.constraint(equalToSystemSpacingAfter: movieName.trailingAnchor, multiplier: 3)
+            movieNameLabel.topAnchor.constraint(equalTo: posterImageView.topAnchor),
+            contentView.trailingAnchor.constraint(equalToSystemSpacingAfter: movieNameLabel.trailingAnchor, multiplier: 1),
+            movieNameLabel.leadingAnchor.constraint(equalToSystemSpacingAfter: posterImageView.trailingAnchor, multiplier: 1)
+        ])
+        
+        detailLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        detailLabel.textColor = .secondaryLabel
+        detailLabel.textAlignment = .right
+        detailLabel.translatesAutoresizingMaskIntoConstraints = false
+        detailLabel.numberOfLines = 0
+        
+        NSLayoutConstraint.activate([
+            detailLabel.trailingAnchor.constraint(equalTo: movieNameLabel.trailingAnchor),
+            detailLabel.topAnchor.constraint(equalToSystemSpacingBelow: movieNameLabel.bottomAnchor, multiplier: 2),
+            detailLabel.leadingAnchor.constraint(equalToSystemSpacingAfter: posterImageView.trailingAnchor, multiplier: 1),
+            contentView.bottomAnchor.constraint(equalToSystemSpacingBelow: detailLabel.bottomAnchor, multiplier: 2)
         ])
     }
     
     
     func configurePoster() {
-        poster.translatesAutoresizingMaskIntoConstraints = false
-        poster.image = UIImage(named: "testImage")
-        poster.contentMode = .scaleAspectFill
-        poster.layer.cornerRadius = 6
-        poster.clipsToBounds = true
+        posterImageView.translatesAutoresizingMaskIntoConstraints = false
+        posterImageView.image = UIImage(named: "testImage")
+        posterImageView.contentMode = .scaleAspectFill
+        posterImageView.layer.cornerRadius = 6
+        posterImageView.clipsToBounds = true
 
         NSLayoutConstraint.activate([
-            poster.leadingAnchor.constraint(equalToSystemSpacingAfter: contentView.leadingAnchor, multiplier: 2),
-            poster.topAnchor.constraint(equalToSystemSpacingBelow: contentView.topAnchor, multiplier: 2),
-            contentView.bottomAnchor.constraint(equalToSystemSpacingBelow: poster.bottomAnchor, multiplier: 2),
-            poster.widthAnchor.constraint(equalToConstant: 100)
+            posterImageView.leadingAnchor.constraint(equalToSystemSpacingAfter: contentView.leadingAnchor, multiplier: 2),
+            posterImageView.topAnchor.constraint(equalToSystemSpacingBelow: contentView.topAnchor, multiplier: 2),
+            contentView.bottomAnchor.constraint(equalToSystemSpacingBelow: posterImageView.bottomAnchor, multiplier: 2),
+            posterImageView.widthAnchor.constraint(equalToConstant: 100)
         ])
     }
     
